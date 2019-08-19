@@ -1,0 +1,9 @@
+{
+  "name": "@clickideia/ckeditor5-custom-upload",
+  "version": "0.1.0",
+  "description": "Custom image upload plugin for CKEditor 5",
+  "main": "index.js",
+  "repository": "git@github.com:clickideia/ckeditor5-custom-upload.git",
+  "author": "Clickideia (http://clickideia.com.br)",
+  "license": "GPL-2.0-or-later"
+}
