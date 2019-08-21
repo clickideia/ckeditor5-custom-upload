@@ -1,6 +1,6 @@
 {
-  "name": "@clickideia/ckeditor5-custom-upload",
-  "version": "0.1.0",
+  "name": "ckeditor5-custom-upload",
+  "version": "0.1.8",
   "description": "Custom image upload plugin for CKEditor 5",
   "keywords": [
     "clickideia",
@@ -10,7 +10,7 @@
     "ckeditor5-feature",
     "ckeditor5-plugin"
   ],
-  "main": "index.js",
+  "main": "src/custom-upload.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/clickideia/ckeditor5-custom-upload.git"
@@ -18,6 +18,21 @@
   "author": "Clickideia (http://clickideia.com.br)",
   "license": "GPL-2.0-or-later",
   "dependencies": {
-    "@ckeditor/ckeditor5-core": "^12.2.1"
+    "@ckeditor/ckeditor5-core": "^12.2.1",
+    "@ckeditor/ckeditor5-ui": "^13.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.5.0",
+    "eslint-config-ckeditor5": "^2.0.0",
+    "husky": "^1.3.1",
+    "lint-staged": "^7.0.0"
+  },
+  "scripts": {
+    "lint": "eslint --quiet '**/*.js'"
+  },
+  "lint-staged": {
+    "**/*.js": [
+      "eslint --quiet"
+    ]
   }
 }
