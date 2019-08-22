@@ -2,19 +2,36 @@ import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import Command from '@ckeditor/ckeditor5-core/src/command';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import imageIcon from '@ckeditor/ckeditor5-core/theme/icons/image.svg';
+// import View from '@ckeditor/ckeditor5-ui/src/view';
 
-export class UploadAdapter extends Plugin {
-	constructor(
-		loader
-	) {
-		super();
-		this.loader = loader;
-	}
+// export class UploadAdapter extends Plugin {
+// 	constructor(
+// 		loader
+// 	) {
+// 		super();
+// 		this.loader = loader;
+// 		return
+// 	}
 
-	upload() {}
+// 	upload() {}
 
-	abort() {}
-}
+// 	abort() {}
+// }
+
+// class Adapter {
+// 	constructor(
+// 		loader,
+// 		options
+// 	) {
+// 		this.loader = loader;
+// 		this.options = options;
+// 	}
+// }
+
+// export class ImageInputView extends View {
+// 	constructor()
+// }
+
 export class BatataUI extends Plugin {
 	pluginName() {
 		return 'BatataUI';
@@ -176,6 +193,12 @@ export class BatataCommand extends Command {
 						}
 					);
 				}
+			)
+			.catch(
+				err =>
+					console.error(
+						err
+					)
 			);
 	}
 
