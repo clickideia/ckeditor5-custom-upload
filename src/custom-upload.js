@@ -2,34 +2,17 @@ import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import Command from '@ckeditor/ckeditor5-core/src/command';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import imageIcon from '@ckeditor/ckeditor5-core/theme/icons/image.svg';
+// import CustomUploadApdapter from './upload-adapter';
 // import View from '@ckeditor/ckeditor5-ui/src/view';
 
-// export class UploadAdapter extends Plugin {
-// 	constructor(
-// 		loader
-// 	) {
-// 		super();
-// 		this.loader = loader;
-// 		return
+// export default class CustomUpload extends Plugin {
+// 	static get pluginName() {
+// 		return 'CustomUpload';
 // 	}
 
-// 	upload() {}
-
-// 	abort() {}
-// }
-
-// class Adapter {
-// 	constructor(
-// 		loader,
-// 		options
-// 	) {
-// 		this.loader = loader;
-// 		this.options = options;
+// 	static get requires() {
+// 		return [ CustomUploadEditing, CustomUploadUI, CustomUploadApdapter ];
 // 	}
-// }
-
-// export class ImageInputView extends View {
-// 	constructor()
 // }
 
 export class BatataUI extends Plugin {
@@ -61,7 +44,7 @@ export class BatataUI extends Plugin {
 				button.set(
 					{
 						label: t(
-							'Aperta a batata'
+							'Insira uma uma imagem'
 						),
 						icon: imageIcon,
 						tooltip: true
@@ -89,18 +72,6 @@ export class BatataUI extends Plugin {
 		);
 	}
 }
-
-// class BatataUploadAdapter {
-// 	constructor(
-// 		loader
-// 	) {
-// 		this.loader = loader;
-// 	}
-
-// 	upload() {}
-
-// 	abort() {}
-// }
 
 export class BatataCommand extends Command {
 	constructor(
@@ -161,6 +132,7 @@ export class BatataCommand extends Command {
 	fileListener(
 		evt
 	) {
+		evt.preventDefault();
 		const [
 			image
 		] = evt.target.files;

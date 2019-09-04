@@ -19,7 +19,8 @@
   "license": "GPL-2.0-or-later",
   "dependencies": {
     "@ckeditor/ckeditor5-core": "^12.2.1",
-    "@ckeditor/ckeditor5-ui": "^13.0.2"
+    "@ckeditor/ckeditor5-ui": "^14.0.0",
+    "@ckeditor/ckeditor5-upload": "^12.0.0"
   },
   "devDependencies": {
     "eslint": "^5.5.0",

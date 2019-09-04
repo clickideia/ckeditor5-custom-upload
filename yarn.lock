@@ -44,6 +44,15 @@
     "@ckeditor/ckeditor5-utils" "^13.0.1"
     lodash-es "^4.17.10"
 
+"@ckeditor/ckeditor5-upload@^11.1.1":
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-upload/-/ckeditor5-upload-11.1.1.tgz#d4144de04bd957d677940c3e9e065afe5b023ab7"
+  integrity sha512-uB8DYTw2BJrNPjSWh6u6udlprVeN2BeQbbZiSiIstJSS3q4vr90FPnhZ5lvtwxvo9lMXLMgGZUwz1Nkulj5oSg==
+  dependencies:
+    "@ckeditor/ckeditor5-core" "^12.2.1"
+    "@ckeditor/ckeditor5-ui" "^13.0.2"
+    "@ckeditor/ckeditor5-utils" "^13.0.1"
+
 "@ckeditor/ckeditor5-utils@^13.0.1":
   version "13.0.1"
   resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-utils/-/ckeditor5-utils-13.0.1.tgz#fc51c8d2e661d6ccd05748c1c53f1975835e1cbd"
