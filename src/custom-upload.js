@@ -2,7 +2,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import imageIcon from "@ckeditor/ckeditor5-core/theme/icons/image.svg";
-// import CustomUploadApdapter from './upload-adapter';
+// import CustomUploadApdapter from "./upload-adapter";
 // import View from '@ckeditor/ckeditor5-ui/src/view';
 
 // export default class CustomUpload extends Plugin {

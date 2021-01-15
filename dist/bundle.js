@@ -100,7 +100,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ckeditor_ckeditor5_paragraph_src_paragraph__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ckeditor/ckeditor5-paragraph/src/paragraph */ "./node_modules/@ckeditor/ckeditor5-paragraph/src/paragraph.js");
 /* harmony import */ var _ckeditor_ckeditor5_basic_styles_src_bold__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ckeditor/ckeditor5-basic-styles/src/bold */ "./node_modules/@ckeditor/ckeditor5-basic-styles/src/bold.js");
 /* harmony import */ var _ckeditor_ckeditor5_basic_styles_src_italic__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ckeditor/ckeditor5-basic-styles/src/italic */ "./node_modules/@ckeditor/ckeditor5-basic-styles/src/italic.js");
-/* harmony import */ var _src_custom_upload__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./src/custom-upload */ "./src/custom-upload.js");
+/* harmony import */ var _ckeditor_ckeditor5_adapter_ckfinder_src_uploadadapter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter */ "./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js");
+/* harmony import */ var _src_upload_adapter__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./src/upload-adapter */ "./src/upload-adapter.js");
+/* harmony import */ var _src_custom_upload__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./src/custom-upload */ "./src/custom-upload.js");
+
+
 
 
 
@@ -114,19 +118,326 @@ _ckeditor_ckeditor5_editor_classic_src_classiceditor__WEBPACK_IMPORTED_MODULE_0_
     _ckeditor_ckeditor5_paragraph_src_paragraph__WEBPACK_IMPORTED_MODULE_2__["default"],
     _ckeditor_ckeditor5_basic_styles_src_bold__WEBPACK_IMPORTED_MODULE_3__["default"],
     _ckeditor_ckeditor5_basic_styles_src_italic__WEBPACK_IMPORTED_MODULE_4__["default"],
-    _src_custom_upload__WEBPACK_IMPORTED_MODULE_5__["Batata"],
-    _src_custom_upload__WEBPACK_IMPORTED_MODULE_5__["BatataUI"],
-    _src_custom_upload__WEBPACK_IMPORTED_MODULE_5__["BatataCommand"],
-    _src_custom_upload__WEBPACK_IMPORTED_MODULE_5__["BatataEditing"],
+    _ckeditor_ckeditor5_adapter_ckfinder_src_uploadadapter__WEBPACK_IMPORTED_MODULE_5__["default"],
+    _src_custom_upload__WEBPACK_IMPORTED_MODULE_7__["Batata"],
+    _src_custom_upload__WEBPACK_IMPORTED_MODULE_7__["BatataUI"],
+    _src_custom_upload__WEBPACK_IMPORTED_MODULE_7__["BatataCommand"],
+    _src_custom_upload__WEBPACK_IMPORTED_MODULE_7__["BatataEditing"],
   ],
   toolbar: ["bold", "italic", "insertImage"],
 })
   .then((editor) => {
     console.log("Editor was initialized", editor);
+    window.editor = editor;
   })
   .catch((error) => {
     console.error(error.stack);
   });
+
+
+/***/ }),
+
+/***/ "./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js ***!
+  \********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CKFinderUploadAdapter; });
+/* harmony import */ var _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ckeditor/ckeditor5-core/src/plugin */ "./node_modules/@ckeditor/ckeditor5-core/src/plugin.js");
+/* harmony import */ var _ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ckeditor/ckeditor5-upload/src/filerepository */ "./node_modules/@ckeditor/ckeditor5-upload/src/filerepository.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/utils.js");
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+/* globals XMLHttpRequest, FormData */
+
+/**
+ * @module adapter-ckfinder/uploadadapter
+ */
+
+
+
+
+
+/**
+ * A plugin that enables file uploads in CKEditor 5 using the CKFinder server–side connector.
+ *
+ * See the {@glink features/image-upload/ckfinder "CKFinder file manager integration" guide} to learn how to configure
+ * and use this feature as well as find out more about the full integration with the file manager
+ * provided by the {@link module:ckfinder/ckfinder~CKFinder} plugin.
+ *
+ * Check out the {@glink features/image-upload/image-upload comprehensive "Image upload overview"} to learn about
+ * other ways to upload images into CKEditor 5.
+ *
+ * @extends module:core/plugin~Plugin
+ */
+class CKFinderUploadAdapter extends _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__["default"] {
+	/**
+	 * @inheritDoc
+	 */
+	static get requires() {
+		return [ _ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__["default"] ];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	static get pluginName() {
+		return 'CKFinderUploadAdapter';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	init() {
+		const url = this.editor.config.get( 'ckfinder.uploadUrl' );
+
+		if ( !url ) {
+			return;
+		}
+
+		// Register CKFinderAdapter
+		this.editor.plugins.get( _ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__["default"] ).createUploadAdapter = loader => new UploadAdapter( loader, url, this.editor.t );
+	}
+}
+
+/**
+ * Upload adapter for CKFinder.
+ *
+ * @private
+ * @implements module:upload/filerepository~UploadAdapter
+ */
+class UploadAdapter {
+	/**
+	 * Creates a new adapter instance.
+	 *
+	 * @param {module:upload/filerepository~FileLoader} loader
+	 * @param {String} url
+	 * @param {module:utils/locale~Locale#t} t
+	 */
+	constructor( loader, url, t ) {
+		/**
+		 * FileLoader instance to use during the upload.
+		 *
+		 * @member {module:upload/filerepository~FileLoader} #loader
+		 */
+		this.loader = loader;
+
+		/**
+		 * Upload URL.
+		 *
+		 * @member {String} #url
+		 */
+		this.url = url;
+
+		/**
+		 * Locale translation method.
+		 *
+		 * @member {module:utils/locale~Locale#t} #t
+		 */
+		this.t = t;
+	}
+
+	/**
+	 * Starts the upload process.
+	 *
+	 * @see module:upload/filerepository~UploadAdapter#upload
+	 * @returns {Promise.<Object>}
+	 */
+	upload() {
+		return this.loader.file.then( file => {
+			return new Promise( ( resolve, reject ) => {
+				this._initRequest();
+				this._initListeners( resolve, reject, file );
+				this._sendRequest( file );
+			} );
+		} );
+	}
+
+	/**
+	 * Aborts the upload process.
+	 *
+	 * @see module:upload/filerepository~UploadAdapter#abort
+	 */
+	abort() {
+		if ( this.xhr ) {
+			this.xhr.abort();
+		}
+	}
+
+	/**
+	 * Initializes the XMLHttpRequest object.
+	 *
+	 * @private
+	 */
+	_initRequest() {
+		const xhr = this.xhr = new XMLHttpRequest();
+
+		xhr.open( 'POST', this.url, true );
+		xhr.responseType = 'json';
+	}
+
+	/**
+	 * Initializes XMLHttpRequest listeners.
+	 *
+	 * @private
+	 * @param {Function} resolve Callback function to be called when the request is successful.
+	 * @param {Function} reject Callback function to be called when the request cannot be completed.
+	 * @param {File} file File instance to be uploaded.
+	 */
+	_initListeners( resolve, reject, file ) {
+		const xhr = this.xhr;
+		const loader = this.loader;
+		const t = this.t;
+		const genericError = t( 'Cannot upload file:' ) + ` ${ file.name }.`;
+
+		xhr.addEventListener( 'error', () => reject( genericError ) );
+		xhr.addEventListener( 'abort', () => reject() );
+		xhr.addEventListener( 'load', () => {
+			const response = xhr.response;
+
+			if ( !response || !response.uploaded ) {
+				return reject( response && response.error && response.error.message ? response.error.message : genericError );
+			}
+
+			resolve( {
+				default: response.url
+			} );
+		} );
+
+		// Upload progress when it's supported.
+		/* istanbul ignore else */
+		if ( xhr.upload ) {
+			xhr.upload.addEventListener( 'progress', evt => {
+				if ( evt.lengthComputable ) {
+					loader.uploadTotal = evt.total;
+					loader.uploaded = evt.loaded;
+				}
+			} );
+		}
+	}
+
+	/**
+	 * Prepares the data and sends the request.
+	 *
+	 * @private
+	 * @param {File} file File instance to be uploaded.
+	 */
+	_sendRequest( file ) {
+		// Prepare form data.
+		const data = new FormData();
+		data.append( 'upload', file );
+		data.append( 'ckCsrfToken', Object(_utils__WEBPACK_IMPORTED_MODULE_2__["getCsrfToken"])() );
+
+		// Send request.
+		this.xhr.send( data );
+	}
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/utils.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@ckeditor/ckeditor5-adapter-ckfinder/src/utils.js ***!
+  \************************************************************************/
+/*! exports provided: getCsrfToken, getCookie, setCookie */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCsrfToken", function() { return getCsrfToken; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCookie", function() { return getCookie; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setCookie", function() { return setCookie; });
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+/* globals window, document */
+
+/**
+ * @module adapter-ckfinder/utils
+ */
+
+const TOKEN_COOKIE_NAME = 'ckCsrfToken';
+const TOKEN_LENGTH = 40;
+const tokenCharset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+/**
+ * Returns the CSRF token value. The value is a hash stored in `document.cookie`
+ * under the `ckCsrfToken` key. The CSRF token can be used to secure the communication
+ * between the web browser and the CKFinder server.
+ *
+ * @returns {String}
+ */
+function getCsrfToken() {
+	let token = getCookie( TOKEN_COOKIE_NAME );
+
+	if ( !token || token.length != TOKEN_LENGTH ) {
+		token = generateToken( TOKEN_LENGTH );
+		setCookie( TOKEN_COOKIE_NAME, token );
+	}
+
+	return token;
+}
+
+/**
+ * Returns the value of the cookie with a given name or `null` if the cookie is not found.
+ *
+ * @param {String} name
+ * @returns {String|null}
+ */
+function getCookie( name ) {
+	name = name.toLowerCase();
+	const parts = document.cookie.split( ';' );
+
+	for ( const part of parts ) {
+		const pair = part.split( '=' );
+		const key = decodeURIComponent( pair[ 0 ].trim().toLowerCase() );
+
+		if ( key === name ) {
+			return decodeURIComponent( pair[ 1 ] );
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Sets the value of the cookie with a given name.
+ *
+ * @param {String} name
+ * @param {String} value
+ */
+function setCookie( name, value ) {
+	document.cookie = encodeURIComponent( name ) + '=' + encodeURIComponent( value ) + ';path=/';
+}
+
+// Generates the CSRF token with the given length.
+//
+// @private
+// @param {Number} length
+// @returns {string}
+function generateToken( length ) {
+	let result = '';
+	const randValues = new Uint8Array( length );
+
+	window.crypto.getRandomValues( randValues );
+
+	for ( let j = 0; j < randValues.length; j++ ) {
+		const character = tokenCharset.charAt( randValues[ j ] % tokenCharset.length );
+		result += Math.random() > 0.5 ? character.toUpperCase() : character;
+	}
+
+	return result;
+}
 
 
 /***/ }),
@@ -2757,6 +3068,179 @@ const ElementApiMixin = {
  *
  * @method #updateSourceElement
  */
+
+
+/***/ }),
+
+/***/ "./node_modules/@ckeditor/ckeditor5-core/src/pendingactions.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@ckeditor/ckeditor5-core/src/pendingactions.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PendingActions; });
+/* harmony import */ var _plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./plugin */ "./node_modules/@ckeditor/ckeditor5-core/src/plugin.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/observablemixin */ "./node_modules/@ckeditor/ckeditor5-utils/src/observablemixin.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/collection */ "./node_modules/@ckeditor/ckeditor5-utils/src/collection.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/ckeditorerror */ "./node_modules/@ckeditor/ckeditor5-utils/src/ckeditorerror.js");
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+/**
+ * @module core/pendingactions
+ */
+
+
+
+
+
+
+/**
+ * The list of pending editor actions.
+ *
+ * This plugin should be used to synchronise plugins that execute long-lasting actions
+ * (e.g. file upload) with the editor integration. It gives the developer who integrates the editor
+ * an easy way to check if there are any actions pending whenever such information is needed.
+ * All plugins that register a pending action also provide a message about the action that is ongoing
+ * which can be displayed to the user. This lets them decide if they want to interrupt the action or wait.
+ *
+ * Adding and updating a pending action:
+ *
+ * 		const pendingActions = editor.plugins.get( 'PendingActions' );
+ * 		const action = pendingActions.add( 'Upload in progress: 0%.' );
+ *
+ *		// You can update the message:
+ * 		action.message = 'Upload in progress: 10%.';
+ *
+ * Removing a pending action:
+ *
+ * 		const pendingActions = editor.plugins.get( 'PendingActions' );
+ * 		const action = pendingActions.add( 'Unsaved changes.' );
+ *
+ * 		pendingActions.remove( action );
+ *
+ * Getting pending actions:
+ *
+ * 		const pendingActions = editor.plugins.get( 'PendingActions' );
+ *
+ * 		const action1 = pendingActions.add( 'Action 1' );
+ * 		const action2 = pendingActions.add( 'Action 2' );
+ *
+ * 		pendingActions.first; // Returns action1
+ * 		Array.from( pendingActions ); // Returns [ action1, action2 ]
+ *
+ * This plugin is used by features like {@link module:upload/filerepository~FileRepository} to register their ongoing actions
+ * and by features like {@link module:autosave/autosave~Autosave} to detect whether there are any ongoing actions.
+ * Read more about saving the data in the {@glink builds/guides/integration/saving-data Saving and getting data} guide.
+ *
+ * @extends module:core/plugin~Plugin
+ */
+class PendingActions extends _plugin__WEBPACK_IMPORTED_MODULE_0__["default"] {
+	/**
+	 * @inheritDoc
+	 */
+	static get pluginName() {
+		return 'PendingActions';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	init() {
+		/**
+		 * Defines whether there is any registered pending action.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Boolean} #hasAny
+		 */
+		this.set( 'hasAny', false );
+
+		/**
+		 * A list of pending actions.
+		 *
+		 * @private
+		 * @type {module:utils/collection~Collection}
+		 */
+		this._actions = new _ckeditor_ckeditor5_utils_src_collection__WEBPACK_IMPORTED_MODULE_2__["default"]( { idProperty: '_id' } );
+		this._actions.delegate( 'add', 'remove' ).to( this );
+	}
+
+	/**
+	 * Adds an action to the list of pending actions.
+	 *
+	 * This method returns an action object with an observable message property.
+	 * The action object can be later used in the {@link #remove} method. It also allows you to change the message.
+	 *
+	 * @param {String} message The action message.
+	 * @returns {Object} An observable object that represents a pending action.
+	 */
+	add( message ) {
+		if ( typeof message !== 'string' ) {
+			/**
+			 * The message must be a string.
+			 *
+			 * @error pendingactions-add-invalid-message
+			 */
+			throw new _ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_3__["default"]( 'pendingactions-add-invalid-message: The message must be a string.', this );
+		}
+
+		const action = Object.create( _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_1__["default"] );
+
+		action.set( 'message', message );
+		this._actions.add( action );
+		this.hasAny = true;
+
+		return action;
+	}
+
+	/**
+	 * Removes an action from the list of pending actions.
+	 *
+	 * @param {Object} action An action object.
+	 */
+	remove( action ) {
+		this._actions.remove( action );
+		this.hasAny = !!this._actions.length;
+	}
+
+	/**
+	 * Returns the first action from the list or null when list is empty
+	 *
+	 * returns {Object|null} The pending action object.
+	 */
+	get first() {
+		return this._actions.get( 0 );
+	}
+
+	/**
+	 * Iterable interface.
+	 *
+	 * @returns {Iterable.<*>}
+	 */
+	[ Symbol.iterator ]() {
+		return this._actions[ Symbol.iterator ]();
+	}
+
+	/**
+	 * Fired when an action is added to the list.
+	 *
+	 * @event add
+	 * @param {Object} action The added action.
+	 */
+
+	/**
+	 * Fired when an action is removed from the list.
+	 *
+	 * @event remove
+	 * @param {Object} action The removed action.
+	 */
+}
 
 
 /***/ }),
@@ -52157,6 +52641,782 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/@ckeditor/ckeditor5-upload/src/filereader.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@ckeditor/ckeditor5-upload/src/filereader.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FileReader; });
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/observablemixin */ "./node_modules/@ckeditor/ckeditor5-utils/src/observablemixin.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_mix__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/mix */ "./node_modules/@ckeditor/ckeditor5-utils/src/mix.js");
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+/**
+ * @module upload/filereader
+ */
+
+/* globals window */
+
+
+
+
+/**
+ * Wrapper over the native `FileReader`.
+ */
+class FileReader {
+	/**
+	 * Creates an instance of the FileReader.
+	 */
+	constructor() {
+		const reader = new window.FileReader();
+
+		/**
+		 * Instance of native FileReader.
+		 *
+		 * @private
+		 * @member {FileReader} #_reader
+		 */
+		this._reader = reader;
+
+		this._data = undefined;
+
+		/**
+		 * Number of bytes loaded.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number} #loaded
+		 */
+		this.set( 'loaded', 0 );
+
+		reader.onprogress = evt => {
+			this.loaded = evt.loaded;
+		};
+	}
+
+	/**
+	 * Returns error that occurred during file reading.
+	 *
+	 * @returns {Error}
+	 */
+	get error() {
+		return this._reader.error;
+	}
+
+	/**
+	 * Holds the data of an already loaded file. The file must be first loaded
+	 * by using {@link module:upload/filereader~FileReader#read `read()`}.
+	 *
+	 * @type {File|undefined}
+	 */
+	get data() {
+		return this._data;
+	}
+
+	/**
+	 * Reads the provided file.
+	 *
+	 * @param {File} file Native File object.
+	 * @returns {Promise.<String>} Returns a promise that will be resolved with file's content.
+	 * The promise will be rejected in case of an error or when the reading process is aborted.
+	 */
+	read( file ) {
+		const reader = this._reader;
+		this.total = file.size;
+
+		return new Promise( ( resolve, reject ) => {
+			reader.onload = () => {
+				const result = reader.result;
+
+				this._data = result;
+
+				resolve( result );
+			};
+
+			reader.onerror = () => {
+				reject( 'error' );
+			};
+
+			reader.onabort = () => {
+				reject( 'aborted' );
+			};
+
+			this._reader.readAsDataURL( file );
+		} );
+	}
+
+	/**
+	 * Aborts file reader.
+	 */
+	abort() {
+		this._reader.abort();
+	}
+}
+
+Object(_ckeditor_ckeditor5_utils_src_mix__WEBPACK_IMPORTED_MODULE_1__["default"])( FileReader, _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_0__["default"] );
+
+
+/***/ }),
+
+/***/ "./node_modules/@ckeditor/ckeditor5-upload/src/filerepository.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@ckeditor/ckeditor5-upload/src/filerepository.js ***!
+  \***********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FileRepository; });
+/* harmony import */ var _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ckeditor/ckeditor5-core/src/plugin */ "./node_modules/@ckeditor/ckeditor5-core/src/plugin.js");
+/* harmony import */ var _ckeditor_ckeditor5_core_src_pendingactions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ckeditor/ckeditor5-core/src/pendingactions */ "./node_modules/@ckeditor/ckeditor5-core/src/pendingactions.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/ckeditorerror */ "./node_modules/@ckeditor/ckeditor5-utils/src/ckeditorerror.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/observablemixin */ "./node_modules/@ckeditor/ckeditor5-utils/src/observablemixin.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/collection */ "./node_modules/@ckeditor/ckeditor5-utils/src/collection.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_mix__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/mix */ "./node_modules/@ckeditor/ckeditor5-utils/src/mix.js");
+/* harmony import */ var _filereader_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./filereader.js */ "./node_modules/@ckeditor/ckeditor5-upload/src/filereader.js");
+/* harmony import */ var _ckeditor_ckeditor5_utils_src_uid_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ckeditor/ckeditor5-utils/src/uid.js */ "./node_modules/@ckeditor/ckeditor5-utils/src/uid.js");
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+/**
+ * @module upload/filerepository
+ */
+
+/* globals console */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * File repository plugin. A central point for managing file upload.
+ *
+ * To use it, first you need an upload adapter. Upload adapter's job is to handle communication with the server
+ * (sending the file and handling server's response). You can use one of the existing plugins introducing upload adapters
+ * (e.g. {@link module:easy-image/cloudservicesuploadadapter~CloudServicesUploadAdapter} or
+ * {@link module:adapter-ckfinder/uploadadapter~CKFinderUploadAdapter}) or write your own one – see
+ * the {@glink framework/guides/deep-dive/upload-adapter "Custom image upload adapter" deep dive guide}.
+ *
+ * Then, you can use {@link module:upload/filerepository~FileRepository#createLoader `createLoader()`} and the returned
+ * {@link module:upload/filerepository~FileLoader} instance to load and upload files.
+ *
+ * @extends module:core/plugin~Plugin
+ */
+class FileRepository extends _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__["default"] {
+	/**
+	 * @inheritDoc
+	 */
+	static get pluginName() {
+		return 'FileRepository';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	static get requires() {
+		return [ _ckeditor_ckeditor5_core_src_pendingactions__WEBPACK_IMPORTED_MODULE_1__["default"] ];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	init() {
+		/**
+		 * Collection of loaders associated with this repository.
+		 *
+		 * @member {module:utils/collection~Collection} #loaders
+		 */
+		this.loaders = new _ckeditor_ckeditor5_utils_src_collection__WEBPACK_IMPORTED_MODULE_4__["default"]();
+
+		// Keeps upload in a sync with pending actions.
+		this.loaders.on( 'add', () => this._updatePendingAction() );
+		this.loaders.on( 'remove', () => this._updatePendingAction() );
+
+		/**
+		 * Loaders mappings used to retrieve loaders references.
+		 *
+		 * @private
+		 * @member {Map<File|Promise, FileLoader>} #_loadersMap
+		 */
+		this._loadersMap = new Map();
+
+		/**
+		 * Reference to a pending action registered in a {@link module:core/pendingactions~PendingActions} plugin
+		 * while upload is in progress. When there is no upload then value is `null`.
+		 *
+		 * @private
+		 * @member {Object} #_pendingAction
+		 */
+		this._pendingAction = null;
+
+		/**
+		 * A factory function which should be defined before using `FileRepository`.
+		 *
+		 * It should return a new instance of {@link module:upload/filerepository~UploadAdapter} that will be used to upload files.
+		 * {@link module:upload/filerepository~FileLoader} instance associated with the adapter
+		 * will be passed to that function.
+		 *
+		 * For more information and example see {@link module:upload/filerepository~UploadAdapter}.
+		 *
+		 * @member {Function} #createUploadAdapter
+		 */
+
+		/**
+		 * Number of bytes uploaded.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number} #uploaded
+		 */
+		this.set( 'uploaded', 0 );
+
+		/**
+		 * Number of total bytes to upload.
+		 *
+		 * It might be different than the file size because of headers and additional data.
+		 * It contains `null` if value is not available yet, so it's better to use {@link #uploadedPercent} to monitor
+		 * the progress.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number|null} #uploadTotal
+		 */
+		this.set( 'uploadTotal', null );
+
+		/**
+		 * Upload progress in percents.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number} #uploadedPercent
+		 */
+		this.bind( 'uploadedPercent' ).to( this, 'uploaded', this, 'uploadTotal', ( uploaded, total ) => {
+			return total ? ( uploaded / total * 100 ) : 0;
+		} );
+	}
+
+	/**
+	 * Returns the loader associated with specified file or promise.
+	 *
+	 * To get loader by id use `fileRepository.loaders.get( id )`.
+	 *
+	 * @param {File|Promise.<File>} fileOrPromise Native file or promise handle.
+	 * @returns {module:upload/filerepository~FileLoader|null}
+	 */
+	getLoader( fileOrPromise ) {
+		return this._loadersMap.get( fileOrPromise ) || null;
+	}
+
+	/**
+	 * Creates a loader instance for the given file.
+	 *
+	 * Requires {@link #createUploadAdapter} factory to be defined.
+	 *
+	 * @param {File|Promise.<File>} fileOrPromise Native File object or native Promise object which resolves to a File.
+	 * @returns {module:upload/filerepository~FileLoader|null}
+	 */
+	createLoader( fileOrPromise ) {
+		if ( !this.createUploadAdapter ) {
+			/**
+			 * You need to enable an upload adapter in order to be able to upload files.
+			 *
+			 * This warning shows up when {@link module:upload/filerepository~FileRepository} is being used
+			 * without {@link #createUploadAdapter definining an upload adapter}.
+			 *
+			 * **If you see this warning when using one of the {@glink builds/index CKEditor 5 Builds}**
+			 * it means that you did not configure any of the upload adapters available by default in those builds.
+			 *
+			 * See the {@glink features/image-upload/image-upload comprehensive "Image upload overview"} to learn which upload
+			 * adapters are available in the builds and how to configure them.
+			 *
+			 * **If you see this warning when using a custom build** there is a chance that you enabled
+			 * a feature like {@link module:image/imageupload~ImageUpload},
+			 * or {@link module:image/imageupload/imageuploadui~ImageUploadUI} but you did not enable any upload adapter.
+			 * You can choose one of the existing upload adapters listed in the
+			 * {@glink features/image-upload/image-upload "Image upload overview"}.
+			 *
+			 * You can also implement your {@glink framework/guides/deep-dive/upload-adapter own image upload adapter}.
+			 *
+			 * @error filerepository-no-upload-adapter
+			 */
+			console.warn( Object(_ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_2__["attachLinkToDocumentation"])(
+				'filerepository-no-upload-adapter: Upload adapter is not defined.'
+			) );
+
+			return null;
+		}
+
+		const loader = new FileLoader( Promise.resolve( fileOrPromise ), this.createUploadAdapter );
+
+		this.loaders.add( loader );
+		this._loadersMap.set( fileOrPromise, loader );
+
+		// Store also file => loader mapping so loader can be retrieved by file instance returned upon Promise resolution.
+		if ( fileOrPromise instanceof Promise ) {
+			loader.file.then( file => {
+				this._loadersMap.set( file, loader );
+			} );
+		}
+
+		// Catch the file promise rejection. If there are no `catch` clause, the browser
+		// will throw an error (see https://github.com/ckeditor/ckeditor5-upload/pull/90).
+		loader.file.catch( () => {
+			// The error will be handled by `FileLoader` so no action is required here.
+		} );
+
+		loader.on( 'change:uploaded', () => {
+			let aggregatedUploaded = 0;
+
+			for ( const loader of this.loaders ) {
+				aggregatedUploaded += loader.uploaded;
+			}
+
+			this.uploaded = aggregatedUploaded;
+		} );
+
+		loader.on( 'change:uploadTotal', () => {
+			let aggregatedTotal = 0;
+
+			for ( const loader of this.loaders ) {
+				if ( loader.uploadTotal ) {
+					aggregatedTotal += loader.uploadTotal;
+				}
+			}
+
+			this.uploadTotal = aggregatedTotal;
+		} );
+
+		return loader;
+	}
+
+	/**
+	 * Destroys the given loader.
+	 *
+	 * @param {File|Promise|module:upload/filerepository~FileLoader} fileOrPromiseOrLoader File or Promise associated
+	 * with that loader or loader itself.
+	 */
+	destroyLoader( fileOrPromiseOrLoader ) {
+		const loader = fileOrPromiseOrLoader instanceof FileLoader ? fileOrPromiseOrLoader : this.getLoader( fileOrPromiseOrLoader );
+
+		loader._destroy();
+
+		this.loaders.remove( loader );
+
+		this._loadersMap.forEach( ( value, key ) => {
+			if ( value === loader ) {
+				this._loadersMap.delete( key );
+			}
+		} );
+	}
+
+	/**
+	 * Registers or deregisters pending action bound with upload progress.
+	 *
+	 * @private
+	 */
+	_updatePendingAction() {
+		const pendingActions = this.editor.plugins.get( _ckeditor_ckeditor5_core_src_pendingactions__WEBPACK_IMPORTED_MODULE_1__["default"] );
+
+		if ( this.loaders.length ) {
+			if ( !this._pendingAction ) {
+				const t = this.editor.t;
+				const getMessage = value => `${ t( 'Upload in progress' ) } ${ parseInt( value ) }%.`;
+
+				this._pendingAction = pendingActions.add( getMessage( this.uploadedPercent ) );
+				this._pendingAction.bind( 'message' ).to( this, 'uploadedPercent', getMessage );
+			}
+		} else {
+			pendingActions.remove( this._pendingAction );
+			this._pendingAction = null;
+		}
+	}
+}
+
+Object(_ckeditor_ckeditor5_utils_src_mix__WEBPACK_IMPORTED_MODULE_5__["default"])( FileRepository, _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_3__["default"] );
+
+/**
+ * File loader class.
+ *
+ * It is used to control the process of reading the file and uploading it using the specified upload adapter.
+ */
+class FileLoader {
+	/**
+	 * Creates a new instance of `FileLoader`.
+	 *
+	 * @param {Promise.<File>} filePromise A promise which resolves to a file instance.
+	 * @param {Function} uploadAdapterCreator The function which returns {@link module:upload/filerepository~UploadAdapter} instance.
+	 */
+	constructor( filePromise, uploadAdapterCreator ) {
+		/**
+		 * Unique id of FileLoader instance.
+		 *
+		 * @readonly
+		 * @member {Number}
+		 */
+		this.id = Object(_ckeditor_ckeditor5_utils_src_uid_js__WEBPACK_IMPORTED_MODULE_7__["default"])();
+
+		/**
+		 * Additional wrapper over the initial file promise passed to this loader.
+		 *
+		 * @private
+		 * @member {module:upload/filerepository~FilePromiseWrapper}
+		 */
+		this._filePromiseWrapper = this._createFilePromiseWrapper( filePromise );
+
+		/**
+		 * Adapter instance associated with this file loader.
+		 *
+		 * @private
+		 * @member {module:upload/filerepository~UploadAdapter}
+		 */
+		this._adapter = uploadAdapterCreator( this );
+
+		/**
+		 * FileReader used by FileLoader.
+		 *
+		 * @protected
+		 * @member {module:upload/filereader~FileReader}
+		 */
+		this._reader = new _filereader_js__WEBPACK_IMPORTED_MODULE_6__["default"]();
+
+		/**
+		 * Current status of FileLoader. It can be one of the following:
+		 *
+		 * * 'idle',
+		 * * 'reading',
+		 * * 'uploading',
+		 * * 'aborted',
+		 * * 'error'.
+		 *
+		 * When reading status can change in a following way:
+		 *
+		 * `idle` -> `reading` -> `idle`
+		 * `idle` -> `reading -> `aborted`
+		 * `idle` -> `reading -> `error`
+		 *
+		 * When uploading status can change in a following way:
+		 *
+		 * `idle` -> `uploading` -> `idle`
+		 * `idle` -> `uploading` -> `aborted`
+		 * `idle` -> `uploading` -> `error`
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {String} #status
+		 */
+		this.set( 'status', 'idle' );
+
+		/**
+		 * Number of bytes uploaded.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number} #uploaded
+		 */
+		this.set( 'uploaded', 0 );
+
+		/**
+		 * Number of total bytes to upload.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number|null} #uploadTotal
+		 */
+		this.set( 'uploadTotal', null );
+
+		/**
+		 * Upload progress in percents.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Number} #uploadedPercent
+		 */
+		this.bind( 'uploadedPercent' ).to( this, 'uploaded', this, 'uploadTotal', ( uploaded, total ) => {
+			return total ? ( uploaded / total * 100 ) : 0;
+		} );
+
+		/**
+		 * Response of the upload.
+		 *
+		 * @readonly
+		 * @observable
+		 * @member {Object|null} #uploadResponse
+		 */
+		this.set( 'uploadResponse', null );
+	}
+
+	/**
+	 * A `Promise` which resolves to a `File` instance associated with this file loader.
+	 *
+	 * @type {Promise.<File|null>}
+	 */
+	get file() {
+		if ( !this._filePromiseWrapper ) {
+			// Loader was destroyed, return promise which resolves to null.
+			return Promise.resolve( null );
+		} else {
+			// The `this._filePromiseWrapper.promise` is chained and not simply returned to handle a case when:
+			//
+			//		* The `loader.file.then( ... )` is called by external code (returned promise is pending).
+			//		* Then `loader._destroy()` is called (call is synchronous) which destroys the `loader`.
+			//		* Promise returned by the first `loader.file.then( ... )` call is resolved.
+			//
+			// Returning `this._filePromiseWrapper.promise` will still resolve to a `File` instance so there
+			// is an additional check needed in the chain to see if `loader` was destroyed in the meantime.
+			return this._filePromiseWrapper.promise.then( file => this._filePromiseWrapper ? file : null );
+		}
+	}
+
+	/**
+	 * Returns the file data. To read its data, you need for first load the file
+	 * by using the {@link module:upload/filerepository~FileLoader#read `read()`} method.
+	 *
+	 * @type {File|undefined}
+	 */
+	get data() {
+		return this._reader.data;
+	}
+
+	/**
+	 * Reads file using {@link module:upload/filereader~FileReader}.
+	 *
+	 * Throws {@link module:utils/ckeditorerror~CKEditorError CKEditorError} `filerepository-read-wrong-status` when status
+	 * is different than `idle`.
+	 *
+	 * Example usage:
+	 *
+	 *	fileLoader.read()
+	 *		.then( data => { ... } )
+	 *		.catch( err => {
+	 *			if ( err === 'aborted' ) {
+	 *				console.log( 'Reading aborted.' );
+	 *			} else {
+	 *				console.log( 'Reading error.', err );
+	 *			}
+	 *		} );
+	 *
+	 * @returns {Promise.<String>} Returns promise that will be resolved with read data. Promise will be rejected if error
+	 * occurs or if read process is aborted.
+	 */
+	read() {
+		if ( this.status != 'idle' ) {
+			throw new _ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_2__["default"]( 'filerepository-read-wrong-status: You cannot call read if the status is different than idle.', this );
+		}
+
+		this.status = 'reading';
+
+		return this._filePromiseWrapper.promise
+			.then( file => this._reader.read( file ) )
+			.then( data => {
+				this.status = 'idle';
+
+				return data;
+			} )
+			.catch( err => {
+				if ( err === 'aborted' ) {
+					this.status = 'aborted';
+					throw 'aborted';
+				}
+
+				this.status = 'error';
+				throw this._reader.error ? this._reader.error : err;
+			} );
+	}
+
+	/**
+	 * Reads file using the provided {@link module:upload/filerepository~UploadAdapter}.
+	 *
+	 * Throws {@link module:utils/ckeditorerror~CKEditorError CKEditorError} `filerepository-upload-wrong-status` when status
+	 * is different than `idle`.
+	 * Example usage:
+	 *
+	 *	fileLoader.upload()
+	 *		.then( data => { ... } )
+	 *		.catch( e => {
+	 *			if ( e === 'aborted' ) {
+	 *				console.log( 'Uploading aborted.' );
+	 *			} else {
+	 *				console.log( 'Uploading error.', e );
+	 *			}
+	 *		} );
+	 *
+	 * @returns {Promise.<Object>} Returns promise that will be resolved with response data. Promise will be rejected if error
+	 * occurs or if read process is aborted.
+	 */
+	upload() {
+		if ( this.status != 'idle' ) {
+			throw new _ckeditor_ckeditor5_utils_src_ckeditorerror__WEBPACK_IMPORTED_MODULE_2__["default"](
+				'filerepository-upload-wrong-status: You cannot call upload if the status is different than idle.',
+				this
+			);
+		}
+
+		this.status = 'uploading';
+
+		return this._filePromiseWrapper.promise
+			.then( () => this._adapter.upload() )
+			.then( data => {
+				this.uploadResponse = data;
+				this.status = 'idle';
+
+				return data;
+			} )
+			.catch( err => {
+				if ( this.status === 'aborted' ) {
+					throw 'aborted';
+				}
+
+				this.status = 'error';
+				throw err;
+			} );
+	}
+
+	/**
+	 * Aborts loading process.
+	 */
+	abort() {
+		const status = this.status;
+		this.status = 'aborted';
+
+		if ( !this._filePromiseWrapper.isFulfilled ) {
+			this._filePromiseWrapper.rejecter( 'aborted' );
+		} else if ( status == 'reading' ) {
+			this._reader.abort();
+		} else if ( status == 'uploading' && this._adapter.abort ) {
+			this._adapter.abort();
+		}
+
+		this._destroy();
+	}
+
+	/**
+	 * Performs cleanup.
+	 *
+	 * @private
+	 */
+	_destroy() {
+		this._filePromiseWrapper = undefined;
+		this._reader = undefined;
+		this._adapter = undefined;
+		this.uploadResponse = undefined;
+	}
+
+	/**
+	 * Wraps a given file promise into another promise giving additional
+	 * control (resolving, rejecting, checking if fulfilled) over it.
+	 *
+	 * @private
+	 * @param filePromise The initial file promise to be wrapped.
+	 * @returns {module:upload/filerepository~FilePromiseWrapper}
+	 */
+	_createFilePromiseWrapper( filePromise ) {
+		const wrapper = {};
+
+		wrapper.promise = new Promise( ( resolve, reject ) => {
+			wrapper.resolver = resolve;
+			wrapper.rejecter = reject;
+			wrapper.isFulfilled = false;
+
+			filePromise
+				.then( file => {
+					wrapper.isFulfilled = true;
+					resolve( file );
+				} )
+				.catch( err => {
+					wrapper.isFulfilled = true;
+					reject( err );
+				} );
+		} );
+
+		return wrapper;
+	}
+}
+
+Object(_ckeditor_ckeditor5_utils_src_mix__WEBPACK_IMPORTED_MODULE_5__["default"])( FileLoader, _ckeditor_ckeditor5_utils_src_observablemixin__WEBPACK_IMPORTED_MODULE_3__["default"] );
+
+/**
+ * Upload adapter interface used by the {@link module:upload/filerepository~FileRepository file repository}
+ * to handle file upload. An upload adapter is a bridge between the editor and server that handles file uploads.
+ * It should contain a logic necessary to initiate an upload process and monitor its progress.
+ *
+ * Learn how to develop your own upload adapter for CKEditor 5 in the
+ * {@glink framework/guides/deep-dive/upload-adapter "Custom upload adapter" guide}.
+ *
+ * @interface UploadAdapter
+ */
+
+/**
+ * Executes the upload process.
+ * This method should return a promise that will resolve when data will be uploaded to server. Promise should be
+ * resolved with an object containing information about uploaded file:
+ *
+ *		{
+ *			default: 'http://server/default-size.image.png'
+ *		}
+ *
+ * Additionally, other image sizes can be provided:
+ *
+ *		{
+ *			default: 'http://server/default-size.image.png',
+ *			'160': 'http://server/size-160.image.png',
+ *			'500': 'http://server/size-500.image.png',
+ *			'1000': 'http://server/size-1000.image.png',
+ *			'1052': 'http://server/default-size.image.png'
+ *		}
+ *
+ * NOTE: When returning multiple images, the widest returned one should equal the default one. It is essential to
+ * correctly set `width` attribute of the image. See this discussion:
+ * https://github.com/ckeditor/ckeditor5-easy-image/issues/4 for more information.
+ *
+ * Take a look at {@link module:upload/filerepository~UploadAdapter example Adapter implementation} and
+ * {@link module:upload/filerepository~FileRepository#createUploadAdapter createUploadAdapter method}.
+ *
+ * @method module:upload/filerepository~UploadAdapter#upload
+ * @returns {Promise.<Object>} Promise that should be resolved when data is uploaded.
+ */
+
+/**
+ * Aborts the upload process.
+ * After aborting it should reject promise returned from {@link #upload upload()}.
+ *
+ * Take a look at {@link module:upload/filerepository~UploadAdapter example Adapter implementation} and
+ * {@link module:upload/filerepository~FileRepository#createUploadAdapter createUploadAdapter method}.
+ *
+ * @method module:upload/filerepository~UploadAdapter#abort
+ */
+
+/**
+ * Object returned by {@link module:upload/filerepository~FileLoader#_createFilePromiseWrapper} method
+ * to add more control over the initial file promise passed to {@link module:upload/filerepository~FileLoader}.
+ *
+ * @typedef {Object} module:upload/filerepository~FilePromiseWrapper
+ * @property {Promise.<File>} promise Wrapper promise which can be chained for further processing.
+ * @property {Function} resolver Resolves the promise when called.
+ * @property {Function} rejecter Rejects the promise when called.
+ * @property {Boolean} isFulfilled Whether original promise is already fulfilled.
+ */
+
+
+/***/ }),
+
 /***/ "./node_modules/@ckeditor/ckeditor5-utils/src/ckeditorerror.js":
 /*!*********************************************************************!*\
   !*** ./node_modules/@ckeditor/ckeditor5-utils/src/ckeditorerror.js ***!
@@ -92487,7 +93747,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// import CustomUploadApdapter from './upload-adapter';
+// import CustomUploadApdapter from "./upload-adapter";
 // import View from '@ckeditor/ckeditor5-ui/src/view';
 
 // export default class CustomUpload extends Plugin {
@@ -92613,6 +93873,68 @@ class Batata extends _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODUL
   requires() {
     return [BatataCommand, BatataUI];
   }
+}
+
+
+/***/ }),
+
+/***/ "./src/upload-adapter.js":
+/*!*******************************!*\
+  !*** ./src/upload-adapter.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CustomUploadApdapter; });
+/* harmony import */ var _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ckeditor/ckeditor5-core/src/plugin */ "./node_modules/@ckeditor/ckeditor5-core/src/plugin.js");
+/* harmony import */ var _ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @ckeditor/ckeditor5-upload/src/filerepository */ "./node_modules/@ckeditor/ckeditor5-upload/src/filerepository.js");
+
+
+
+class CustomUploadApdapter extends _ckeditor_ckeditor5_core_src_plugin__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  static get requires() {
+    return [_ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__["default"]];
+  }
+
+  static get pluginName() {
+    return "CustomUploadAdapter";
+  }
+
+  init() {
+    const options = this.editor.config.get("customUpload");
+
+    if (!options) {
+      return;
+    }
+
+    if (!options.uploadPromise) {
+      // eslint-disable-next-line max-len
+      console.warn(
+        '(@clickideia/ckeditor5-custom-upload) Missing the "uploadPromise" property in the "customUpload" editor configuration.'
+      );
+
+      return;
+    }
+
+    this.editor.plugins.get(_ckeditor_ckeditor5_upload_src_filerepository__WEBPACK_IMPORTED_MODULE_1__["default"]).createUploadAdapter = (loader) => {
+      return new UploadAdapter(loader, options);
+    };
+  }
+}
+
+class UploadAdapter {
+  constructor(loader, options) {
+    this.loader = loader;
+    this.options = options;
+  }
+
+  upload() {
+    return this.loader.file.then((image) => this.options.uploadPromise(image));
+  }
+
+  abort() {}
 }
 
 
